@@ -1,10 +1,13 @@
 package com.vshmaliukh.test_project.entities;
 
-import jakarta.persistence.*;
+import lombok.Data;
 
+import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
+@Data
+@Table(name="privileges")
 public class Privilege {
 
     @Id
