@@ -5,15 +5,17 @@
     <title>Hello World!</title>
 </head>
 <body>
-<h1 th:text="|Hello ${user.getEmail()} !|"></h1>
-<h2 th:text="|Action: ${action}|"></h2>
+<div>
+    <h1 th:text="|Hello ${user.getName()} !|"></h1>
+    <h2 th:text="|Action: ${action}|"></h2>
 
-<form th:action="@{/admin-action}" method="post">
-    <input type="submit" value="admin-action"/>
-</form>
+    <form th:action="@{/admin-action}" method="post">
+        <input type="submit" value="admin-action"/>
+    </form>
 
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
-</form>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+</div>
 </body>
 </html>

@@ -57,10 +57,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void saveDefaultAdmin() {
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         User user = new User();
-        user.setFirstName("admin");
-        user.setLastName("admin");
+        user.setName("admin");
         user.setPassword(passwordEncoder.encode("000"));
-        user.setEmail("admin");
+        user.setEmail("admin@mail.com");
         user.setRoles(Collections.singletonList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);
@@ -69,10 +68,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void saveDefaultUser() {
         Role adminRole = roleRepository.findByName("ROLE_USER");
         User user = new User();
-        user.setFirstName("user");
-        user.setLastName("user");
+        user.setName("user");
         user.setPassword(passwordEncoder.encode("000"));
-        user.setEmail("user");
+        user.setEmail("user@mail.com");
         user.setRoles(Collections.singletonList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);

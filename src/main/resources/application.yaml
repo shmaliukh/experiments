@@ -1,6 +1,9 @@
 server:
   port: 8083
 
+app:
+  rememberMeTime: !!int 10
+
 spring:
   h2:
     console:

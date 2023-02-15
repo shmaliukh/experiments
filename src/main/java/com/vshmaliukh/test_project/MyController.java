@@ -28,7 +28,7 @@ public class MyController {
     public ModelAndView doGetHello(@RequestParam(defaultValue = "") String action,
                                    Principal principal,
                                    ModelMap modelMap) {
-        User user = userService.userRepository.findByEmail(principal.getName());
+        User user = userService.userRepository.findByName(principal.getName());
 
         modelMap.addAttribute(user);
         modelMap.addAttribute("action", action);

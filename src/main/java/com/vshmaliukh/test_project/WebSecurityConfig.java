@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 
 
 @Slf4j
@@ -17,8 +19,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @AllArgsConstructor
 public class WebSecurityConfig {
+    public static final String REMEMBER_ME_KEY_STR = "uniqueAndSecret";
+
+//    @Value("${app.rememberMeTime}")
+//    int rememberMeTime;
 
     final MyUserDetailsService userDetailsService;
+
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -39,7 +46,13 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public RememberMeServices rememberMeServices() {
+        return new CustomRememberMeServices(REMEMBER_ME_KEY_STR, userDetailsService, new InMemoryTokenRepositoryImpl());
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        MyUserDetailsService userDetailsService1 = userDetailsService;
         http.authorizeHttpRequests()
                 .antMatchers("/")
                 .permitAll()
@@ -49,9 +62,22 @@ public class WebSecurityConfig {
                 .defaultSuccessUrl("/hello")
                 .permitAll()
                     .and()
+                .rememberMe()
+                .rememberMeServices(rememberMeServices())
+                .key(REMEMBER_ME_KEY_STR)
+                .tokenValiditySeconds(10)
+                .rememberMeParameter("remember-me")
+                    .and()
                 .logout()
                 .logoutSuccessUrl("/login")
-                .permitAll();
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+        ;
+        ;
+        //Remember Me cookie contains the following data:
+        //username – to identify the logged-in principal
+        //expirationTime – to expire the cookie; default is 2 weeks
+        //MD5 hash – of the previous 2 values – username and expirationTime, plus the password and the predefined key
 
         return http.build();
     }

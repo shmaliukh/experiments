@@ -21,12 +21,12 @@ import java.util.*;
 @AllArgsConstructor
 public class MyUserDetailsService implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByName(username);
         if (user == null) {
             return new org.springframework.security.core.userdetails.User(
                     " ", " ", true, true, true, true,
@@ -34,7 +34,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(), user.getPassword(), user.isEnabled(), true, true,
+                user.getName(), user.getPassword(), user.isEnabled(), true, true,
                 true, getAuthorities(user.getRoles()));
     }
 
