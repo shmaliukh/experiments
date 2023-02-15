@@ -9,6 +9,7 @@ import com.vshmaliukh.test_project.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -22,6 +23,8 @@ import java.util.List;
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
 //    boolean alreadySetup = false;
+
+    private PasswordEncoder passwordEncoder;
 
     private UserRepository userRepository;
     private RoleRepository roleRepository;
@@ -45,17 +48,34 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
         createRoleIfNotFound("ROLE_USER", Collections.singletonList(readPrivilege));
 
+        saveDefaultAdmin();
+        saveDefaultUser();
+
+//        alreadySetup = true;
+    }
+
+    private void saveDefaultAdmin() {
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         User user = new User();
-        user.setFirstName("Test");
-        user.setLastName("Test");
-        user.setPassword("test");
-        user.setEmail("test@test.com");
+        user.setFirstName("admin");
+        user.setLastName("admin");
+        user.setPassword(passwordEncoder.encode("000"));
+        user.setEmail("admin");
         user.setRoles(Collections.singletonList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);
+    }
 
-//        alreadySetup = true;
+    private void saveDefaultUser() {
+        Role adminRole = roleRepository.findByName("ROLE_USER");
+        User user = new User();
+        user.setFirstName("user");
+        user.setLastName("user");
+        user.setPassword(passwordEncoder.encode("000"));
+        user.setEmail("user");
+        user.setRoles(Collections.singletonList(adminRole));
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -71,8 +91,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    Role createRoleIfNotFound(
-            String name, Collection<Privilege> privileges) {
+    Role createRoleIfNotFound(String name, Collection<Privilege> privileges) {
 
         Role role = roleRepository.findByName(name);
         if (role == null) {

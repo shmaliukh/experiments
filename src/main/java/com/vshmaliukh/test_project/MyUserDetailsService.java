@@ -5,32 +5,27 @@ import com.vshmaliukh.test_project.entities.Role;
 import com.vshmaliukh.test_project.entities.User;
 import com.vshmaliukh.test_project.repositories.RoleRepository;
 import com.vshmaliukh.test_project.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+@Service
 @Transactional
+@AllArgsConstructor
 public class MyUserDetailsService implements UserDetailsService {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserService service;
-
-    @Autowired
     private RoleRepository roleRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
-
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return new org.springframework.security.core.userdetails.User(
@@ -43,14 +38,11 @@ public class MyUserDetailsService implements UserDetailsService {
                 true, getAuthorities(user.getRoles()));
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(
-            Collection<Role> roles) {
-
+    private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
         return getGrantedAuthorities(getPrivileges(roles));
     }
 
     private List<String> getPrivileges(Collection<Role> roles) {
-
         List<String> privileges = new ArrayList<>();
         List<Privilege> collection = new ArrayList<>();
         for (Role role : roles) {
