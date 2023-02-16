@@ -19,7 +19,10 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
 @EnableWebSecurity
 @AllArgsConstructor
 public class WebSecurityConfig {
+
     public static final String REMEMBER_ME_KEY_STR = "uniqueAndSecret";
+    public static final String REMEMBER_ME_COOKIE_NAME = "remember-me";
+    public static final int REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS = 10;
 
 //    @Value("${app.rememberMeTime}")
 //    int rememberMeTime;
@@ -52,7 +55,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        MyUserDetailsService userDetailsService1 = userDetailsService;
         http.authorizeHttpRequests()
                 .antMatchers("/")
                 .permitAll()
@@ -65,8 +67,8 @@ public class WebSecurityConfig {
                 .rememberMe()
                 .rememberMeServices(rememberMeServices())
                 .key(REMEMBER_ME_KEY_STR)
-                .tokenValiditySeconds(10)
-                .rememberMeParameter("remember-me")
+                .tokenValiditySeconds(REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS)
+                .rememberMeParameter(REMEMBER_ME_COOKIE_NAME)
                     .and()
                 .logout()
                 .logoutSuccessUrl("/login")
