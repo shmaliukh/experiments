@@ -1,19 +1,12 @@
 server:
   port: 8083
 
-app:
-  rememberMe:
-    time: !!int 100
-    key: cookieName
-    cookieName: rememberMe
-
-
 spring:
   h2:
     console:
       enabled: true
   datasource:
-    url: jdbc:h2:mem:test_db
+    url: jdbc:h2:mem:customItemTest
     username: sa
     password: password
     driverClassName: org.h2.Driver

@@ -1,7 +1,7 @@
 package com.vshmaliukh.test_project;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,18 +17,22 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
 public class WebSecurityConfig {
 
-    public static final String REMEMBER_ME_KEY_STR = "uniqueAndSecret";
-    public static final String REMEMBER_ME_COOKIE_NAME = "remember-me";
-    public static final int REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS = 10;
+    @Value("${app.rememberMe.time:1000}")
+    private int rememberMeTime;
 
-//    @Value("${app.rememberMeTime}")
-//    int rememberMeTime;
+    @Value("${app.rememberMe.cookieName:rememberMe}")
+    private String rememberMeCookieName;
 
-    final MyUserDetailsService userDetailsService;
+    @Value("${app.rememberMe.key:uniqueAndSecret}")
+    private String rememberMeKey;
 
+    private final MyUserDetailsService userDetailsService;
+
+    public WebSecurityConfig(MyUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -50,7 +54,7 @@ public class WebSecurityConfig {
 
     @Bean
     public RememberMeServices rememberMeServices() {
-        return new CustomRememberMeServices(REMEMBER_ME_KEY_STR, userDetailsService, new InMemoryTokenRepositoryImpl());
+        return new CustomRememberMeServices(rememberMeKey, userDetailsService, new InMemoryTokenRepositoryImpl());
     }
 
     @Bean
@@ -66,15 +70,14 @@ public class WebSecurityConfig {
                     .and()
                 .rememberMe()
                 .rememberMeServices(rememberMeServices())
-                .key(REMEMBER_ME_KEY_STR)
-                .tokenValiditySeconds(REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS)
-                .rememberMeParameter(REMEMBER_ME_COOKIE_NAME)
+                .key(rememberMeKey)
+                .tokenValiditySeconds(rememberMeTime)
+                .rememberMeParameter(rememberMeCookieName)
                     .and()
                 .logout()
                 .logoutSuccessUrl("/login")
                 .deleteCookies("JSESSIONID")
                 .permitAll()
-        ;
         ;
         //Remember Me cookie contains the following data:
         //username – to identify the logged-in principal

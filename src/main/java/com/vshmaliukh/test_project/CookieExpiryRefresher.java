@@ -1,5 +1,7 @@
 package com.vshmaliukh.test_project;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -9,10 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.Arrays;
 
-import static com.vshmaliukh.test_project.WebSecurityConfig.REMEMBER_ME_COOKIE_NAME;
-import static com.vshmaliukh.test_project.WebSecurityConfig.REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS;
-
+@Component
 public class CookieExpiryRefresher implements HandlerInterceptor {
+
+    @Value("${app.rememberMe.time:1000}")
+    private int rememberMeTime;
+
+    @Value("${app.rememberMe.cookieName:rememberMe}")
+    private String rememberMeCookieName;
 
     @Override
     public void postHandle(HttpServletRequest request,
@@ -22,19 +28,19 @@ public class CookieExpiryRefresher implements HandlerInterceptor {
         refreshRememberMeCookie(request, response);
     }
 
-    private static void refreshRememberMeCookie(HttpServletRequest request, HttpServletResponse response) {
+    private void refreshRememberMeCookie(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         boolean cookiesContainsRememberMe = Arrays.stream(cookies)
-                .anyMatch(cookie -> cookie.getName().contentEquals(REMEMBER_ME_COOKIE_NAME));
+                .anyMatch(cookie -> cookie.getName().contentEquals(rememberMeCookieName));
         for (Cookie cookie : cookies) {
-            if (cookie.getName().contentEquals(REMEMBER_ME_COOKIE_NAME)
-                    || (cookiesContainsRememberMe && cookie.getName().contentEquals(REMEMBER_ME_COOKIE_NAME))) {
-                refreshCookie(REMEMBER_ME_TOKEN_VALIDITY_IN_SECONDS, response, cookie);
+            if (cookie.getName().contentEquals(rememberMeCookieName)
+                    || (cookiesContainsRememberMe && cookie.getName().contentEquals("JSESSIONID"))) {
+                refreshCookie(rememberMeTime, response, cookie);
             }
         }
     }
 
-    private static void refreshCookie(int timeInSeconds, HttpServletResponse response, Cookie cookie) {
+    private void refreshCookie(int timeInSeconds, HttpServletResponse response, Cookie cookie) {
         cookie.setMaxAge(timeInSeconds);
         response.addCookie(cookie);
     }
